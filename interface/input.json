@@ -1,0 +1,651 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "导演分镜工作台 · 输入表单",
+  "description": "将剧本与视觉资产转换为 15 秒一页的导演分镜表，并生成 3×3 九宫格分镜图。剧本可上传文件，也可直接输入文本，二选一即可。",
+  "required": [
+    "project_meta"
+  ],
+  "anyOf": [
+    { "required": ["script_file"] },
+    { "required": ["script_content"] }
+  ],
+  "properties": {
+    "command": {
+      "type": "string",
+      "title": "执行阶段",
+      "description": "选择当前要执行的工作流阶段。首次使用请先填写素材与剧本，再选择「生成分镜表」。",
+      "enum": [
+        "storyboard",
+        "grid",
+        "next",
+        "grid-all",
+        "prompt"
+      ],
+      "enumNames": [
+        "阶段一：生成分镜表 (/storyboard)",
+        "阶段二：生成第 1 页宫格图 (/grid)",
+        "阶段二：生成下一页宫格图 (/next)",
+        "阶段二：批量生成全部宫格图 (/grid-all)",
+        "阶段二：输出全部生图提示词 (/prompt)"
+      ],
+      "default": "storyboard",
+      "ui_component": "select"
+    },
+    "project_meta": {
+      "type": "object",
+      "title": "项目信息",
+      "ui_component": "section",
+      "required": [
+        "project_name"
+      ],
+      "properties": {
+        "project_name": {
+          "type": "string",
+          "title": "项目名称",
+          "description": "短片 / 剧情 / 广告 / 二创项目名称",
+          "ui_component": "text"
+        },
+        "project_type": {
+          "type": "string",
+          "title": "项目类型",
+          "description": "例如：真人剧情短片、科幻短片、广告短片、AI 视频短片",
+          "ui_component": "text"
+        },
+        "target_duration": {
+          "type": "string",
+          "title": "目标时长",
+          "description": "例如：60 秒、90 秒、1–2 分钟",
+          "default": "90 秒",
+          "ui_component": "text"
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "title": "画幅比例",
+          "description": "应用于每个宫格格子的内部画幅，而非整张九宫格画布",
+          "enum": [
+            "9:16",
+            "16:9",
+            "21:9",
+            "1:1",
+            "4:3",
+            "2.35:1"
+          ],
+          "enumNames": [
+            "9:16 竖屏",
+            "16:9 横屏",
+            "21:9 宽银幕",
+            "1:1 方形",
+            "4:3 传统",
+            "2.35:1 电影宽银幕"
+          ],
+          "default": "9:16",
+          "ui_component": "select"
+        },
+        "visual_texture": {
+          "type": "string",
+          "title": "影像质感",
+          "description": "整体视觉方向，例如：真人电影胶片质感、低饱和冷灰色、轻微胶片颗粒",
+          "default": "真人电影胶片质感，低饱和，写实光影，轻微胶片颗粒",
+          "ui_component": "textarea"
+        },
+        "output_language": {
+          "type": "string",
+          "title": "输出语言",
+          "enum": [
+            "zh-CN",
+            "zh-TW",
+            "en"
+          ],
+          "enumNames": [
+            "简体中文",
+            "繁体中文",
+            "English"
+          ],
+          "default": "zh-CN",
+          "ui_component": "select"
+        }
+      }
+    },
+    "script_input_method": {
+      "type": "string",
+      "title": "剧本输入方式",
+      "description": "选择上传文件或直接输入文本，两种方式任选其一即可。",
+      "enum": [
+        "file",
+        "text"
+      ],
+      "enumNames": [
+        "上传剧本文件",
+        "直接输入文本"
+      ],
+      "default": "file",
+      "ui_component": "radio"
+    },
+    "script_file": {
+      "type": "object",
+      "title": "上传剧本",
+      "description": "上传完整剧本文件。选择「直接输入文本」时可留空。支持 .txt、.md、.docx、.pdf 等格式。",
+      "ui_component": "file_uploader",
+      "required": [
+        "file_url"
+      ],
+      "properties": {
+        "file_url": {
+          "type": "string",
+          "title": "剧本文件",
+          "format": "uri"
+        },
+        "file_name": {
+          "type": "string",
+          "title": "文件名"
+        },
+        "file_type": {
+          "type": "string",
+          "title": "文件类型",
+          "enum": [
+            "txt",
+            "md",
+            "docx",
+            "pdf",
+            "other"
+          ],
+          "enumNames": [
+            "纯文本 (.txt)",
+            "Markdown (.md)",
+            "Word (.docx)",
+            "PDF (.pdf)",
+            "其他"
+          ]
+        }
+      }
+    },
+    "script_content": {
+      "type": "string",
+      "title": "直接输入剧本",
+      "description": "在此粘贴或输入完整剧本、故事梗概或分场描述。选择「上传剧本文件」时可留空；若两者都填写，以上传文件为主、此处作为补充说明。",
+      "ui_component": "textarea"
+    },
+    "characters": {
+      "type": "array",
+      "title": "角色资产",
+      "description": "每个主要角色单独填写一组，资产说明越清楚，分镜与宫格图越稳定",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "角色名称",
+            "ui_component": "text"
+          },
+          "identity": {
+            "type": "string",
+            "title": "角色身份",
+            "ui_component": "text"
+          },
+          "role_in_story": {
+            "type": "string",
+            "title": "角色作用",
+            "description": "在剧情中的主要叙事功能",
+            "ui_component": "textarea"
+          },
+          "asset_images": {
+            "type": "array",
+            "title": "角色参考图",
+            "ui_component": "asset_uploader",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_url"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "title": "图片用途",
+                  "description": "例如：正面全身设计图、面部特写、服装细节图"
+                },
+                "asset_url": {
+                  "type": "string",
+                  "title": "图片链接",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "appearance": {
+            "type": "string",
+            "title": "外貌特征",
+            "description": "年龄感、脸型、发型、发色、肤色、表情气质等必须保持一致的特征",
+            "ui_component": "textarea"
+          },
+          "costume": {
+            "type": "string",
+            "title": "服装特征",
+            "ui_component": "textarea"
+          },
+          "special_structure": {
+            "type": "string",
+            "title": "身体 / 特殊结构",
+            "description": "机械改造、伤疤、面具、翅膀等不可改变的特征",
+            "ui_component": "textarea"
+          },
+          "weapons_and_props": {
+            "type": "string",
+            "title": "武器 / 随身道具",
+            "ui_component": "textarea"
+          },
+          "action_constraints": {
+            "type": "string",
+            "title": "动作限制",
+            "description": "例如：受伤迟缓、步态不稳、武器必须握在右手",
+            "ui_component": "textarea"
+          },
+          "emotional_tone": {
+            "type": "string",
+            "title": "情绪基调",
+            "ui_component": "text"
+          },
+          "consistency_rules": {
+            "type": "string",
+            "title": "一致性要求",
+            "description": "全片必须遵守的角色视觉规则",
+            "ui_component": "textarea"
+          }
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "title": "场景资产",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "场景名称",
+            "ui_component": "text"
+          },
+          "scene_type": {
+            "type": "string",
+            "title": "场景类型",
+            "description": "例如：室内 / 室外 / 科幻 / 月球表面",
+            "ui_component": "text"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "场景作用",
+            "ui_component": "textarea"
+          },
+          "asset_images": {
+            "type": "array",
+            "title": "场景参考图",
+            "ui_component": "asset_uploader",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_url"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "title": "图片用途"
+                },
+                "asset_url": {
+                  "type": "string",
+                  "title": "图片链接",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "spatial_structure": {
+            "type": "string",
+            "title": "空间结构",
+            "description": "主体位置、入口、角色活动区域、前景/中景/背景关系",
+            "ui_component": "textarea"
+          },
+          "lighting": {
+            "type": "string",
+            "title": "光线特征",
+            "ui_component": "textarea"
+          },
+          "color": {
+            "type": "string",
+            "title": "色彩特征",
+            "ui_component": "textarea"
+          },
+          "materials": {
+            "type": "string",
+            "title": "材质特征",
+            "ui_component": "textarea"
+          },
+          "spatial_constraints": {
+            "type": "string",
+            "title": "空间限制",
+            "description": "镜头中不能改变的空间规则",
+            "ui_component": "textarea"
+          },
+          "consistency_rules": {
+            "type": "string",
+            "title": "一致性要求",
+            "ui_component": "textarea"
+          }
+        }
+      }
+    },
+    "props": {
+      "type": "array",
+      "title": "关键道具资产",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "道具名称",
+            "ui_component": "text"
+          },
+          "prop_type": {
+            "type": "string",
+            "title": "道具类型",
+            "description": "武器 / 科技装置 / 交通工具 / 信物 / 场景物件等",
+            "ui_component": "text"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "道具作用",
+            "ui_component": "textarea"
+          },
+          "asset_images": {
+            "type": "array",
+            "title": "道具参考图",
+            "ui_component": "asset_uploader",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_url"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "title": "图片用途"
+                },
+                "asset_url": {
+                  "type": "string",
+                  "title": "图片链接",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "appearance": {
+            "type": "string",
+            "title": "外观特征",
+            "ui_component": "textarea"
+          },
+          "materials": {
+            "type": "string",
+            "title": "材质特征",
+            "ui_component": "textarea"
+          },
+          "usage": {
+            "type": "string",
+            "title": "使用方式",
+            "ui_component": "textarea"
+          },
+          "state_changes": {
+            "type": "string",
+            "title": "状态变化",
+            "description": "例如：关闭→开启、远处出现→降落",
+            "ui_component": "textarea"
+          },
+          "consistency_rules": {
+            "type": "string",
+            "title": "一致性要求",
+            "ui_component": "textarea"
+          }
+        }
+      }
+    },
+    "style_references": {
+      "type": "array",
+      "title": "风格参考",
+      "description": "只控制影像风格，不改变角色身份或剧情场景结构",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "参考名称",
+            "ui_component": "text"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "参考用途",
+            "description": "控制影像质感 / 光影 / 构图 / 色彩 / 空间氛围",
+            "ui_component": "text"
+          },
+          "asset_images": {
+            "type": "array",
+            "title": "风格参考图",
+            "ui_component": "asset_uploader",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_url"
+              ],
+              "properties": {
+                "asset_url": {
+                  "type": "string",
+                  "title": "图片链接",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "extract_from": {
+            "type": "string",
+            "title": "需要提取的内容",
+            "ui_component": "textarea"
+          },
+          "do_not_extract": {
+            "type": "string",
+            "title": "不能提取的内容",
+            "description": "例如：不提取参考图中的人物身份、服装、具体场景物体",
+            "ui_component": "textarea"
+          }
+        }
+      }
+    },
+    "color_grading": {
+      "type": "array",
+      "title": "调色参考",
+      "description": "统一全片颜色与质感，不改变构图和剧情",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "调色名称",
+            "ui_component": "text"
+          },
+          "asset_images": {
+            "type": "array",
+            "title": "调色参考图",
+            "ui_component": "asset_uploader",
+            "items": {
+              "type": "object",
+              "required": [
+                "asset_url"
+              ],
+              "properties": {
+                "asset_url": {
+                  "type": "string",
+                  "title": "图片链接",
+                  "format": "uri"
+                }
+              }
+            }
+          },
+          "main_tone": {
+            "type": "string",
+            "title": "主色调",
+            "ui_component": "text"
+          },
+          "highlights": {
+            "type": "string",
+            "title": "高光",
+            "ui_component": "text"
+          },
+          "shadows": {
+            "type": "string",
+            "title": "阴影",
+            "ui_component": "text"
+          },
+          "skin_treatment": {
+            "type": "string",
+            "title": "皮肤处理",
+            "ui_component": "text"
+          },
+          "material_treatment": {
+            "type": "string",
+            "title": "材质处理",
+            "ui_component": "text"
+          },
+          "grain_texture": {
+            "type": "string",
+            "title": "颗粒与质感",
+            "ui_component": "text"
+          },
+          "forbidden_items": {
+            "type": "string",
+            "title": "禁止项",
+            "description": "调色中不能出现的问题",
+            "ui_component": "textarea"
+          }
+        }
+      }
+    },
+    "stage2_context": {
+      "type": "object",
+      "title": "阶段二上下文（可选）",
+      "description": "执行 /grid、/next、/grid-all、/prompt 时使用。若已在同一会话完成阶段一，可留空。",
+      "ui_component": "section",
+      "properties": {
+        "text_storyboard_markdown": {
+          "type": "string",
+          "title": "文字分镜表",
+          "description": "阶段一生成的完整 Markdown 分镜表，跨会话执行阶段二时必填",
+          "ui_component": "textarea"
+        },
+        "current_page": {
+          "type": "integer",
+          "title": "当前页码",
+          "description": "执行 /next 时表示上次已生成的页码；首次 /grid 时为 0",
+          "minimum": 0,
+          "default": 0,
+          "ui_component": "number"
+        },
+        "previous_grid_image_url": {
+          "type": "string",
+          "title": "上一页宫格图",
+          "description": "执行 /next 时用于跨页视觉连续性的参考图",
+          "format": "uri",
+          "ui_component": "image_uploader"
+        },
+        "total_pages": {
+          "type": "integer",
+          "title": "总页数",
+          "minimum": 1,
+          "ui_component": "number"
+        }
+      }
+    },
+    "advanced_options": {
+      "type": "object",
+      "title": "高级设置",
+      "ui_component": "section",
+      "properties": {
+        "page_duration_seconds": {
+          "type": "integer",
+          "title": "每页时长（秒）",
+          "default": 15,
+          "minimum": 5,
+          "maximum": 30,
+          "ui_component": "number"
+        },
+        "shots_per_page_hint": {
+          "type": "string",
+          "title": "每页镜头数量偏好",
+          "description": "默认 4–6 个，实际数量由戏剧节奏决定",
+          "default": "4-6",
+          "ui_component": "text"
+        },
+        "image_quality": {
+          "type": "string",
+          "title": "宫格图清晰度",
+          "enum": [
+            "2K",
+            "4K"
+          ],
+          "default": "4K",
+          "ui_component": "select"
+        },
+        "visual_style_preset": {
+          "type": "string",
+          "title": "视觉风格预设",
+          "enum": [
+            "live_action_cinematic",
+            "documentary",
+            "commercial",
+            "game_cg",
+            "anime_3d",
+            "custom"
+          ],
+          "enumNames": [
+            "真人电影剧照",
+            "纪录片质感",
+            "广告片质感",
+            "游戏 CG",
+            "3D 动画",
+            "自定义（使用影像质感字段）"
+          ],
+          "default": "live_action_cinematic",
+          "ui_component": "select"
+        },
+        "enable_page_plan": {
+          "type": "boolean",
+          "title": "长剧本先输出页面规划表",
+          "description": "超过 2 分钟或复杂剧本时，先生成页面规划再展开分镜",
+          "default": false,
+          "ui_component": "checkbox"
+        },
+        "special_requirements": {
+          "type": "string",
+          "title": "特殊制作要求",
+          "description": "正反打偏好、机位限制、禁止元素等补充说明",
+          "ui_component": "textarea"
+        }
+      }
+    }
+  }
+}

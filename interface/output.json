@@ -1,0 +1,445 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "导演分镜工作台 · 输出结果",
+  "description": "阶段一输出文字分镜表；阶段二输出 3×3 九宫格分镜图或内部生图提示词。",
+  "properties": {
+    "stage": {
+      "type": "string",
+      "title": "当前阶段",
+      "enum": [
+        "text_storyboard",
+        "grid_images",
+        "image_prompts"
+      ],
+      "enumNames": [
+        "阶段一：文字分镜表",
+        "阶段二：九宫格分镜图",
+        "阶段二：生图提示词"
+      ],
+      "ui_component": "badge"
+    },
+    "status": {
+      "type": "object",
+      "title": "执行状态",
+      "properties": {
+        "message": {
+          "type": "string",
+          "title": "状态消息",
+          "ui_component": "text"
+        },
+        "success": {
+          "type": "boolean",
+          "title": "是否成功",
+          "ui_component": "checkbox"
+        },
+        "current_page": {
+          "type": "integer",
+          "title": "当前完成页码",
+          "ui_component": "number"
+        },
+        "total_pages": {
+          "type": "integer",
+          "title": "总页数",
+          "ui_component": "number"
+        },
+        "next_action": {
+          "type": "string",
+          "title": "建议下一步",
+          "description": "例如：/grid、/next、/grid-all、/prompt",
+          "ui_component": "text"
+        }
+      }
+    },
+    "used_assets": {
+      "type": "array",
+      "title": "使用资产汇总",
+      "description": "全片级别资产表，每类资产只出现一次",
+      "ui_component": "table",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "name",
+          "usage"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "类型",
+            "enum": [
+              "角色",
+              "场景",
+              "道具",
+              "风格参考",
+              "调色参考"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "title": "名称"
+          },
+          "usage": {
+            "type": "string",
+            "title": "使用说明"
+          }
+        }
+      }
+    },
+    "page_plan": {
+      "type": "array",
+      "title": "页面规划表",
+      "description": "长剧本时可选的整体页面规划",
+      "ui_component": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page_number": {
+            "type": "integer",
+            "title": "页码"
+          },
+          "time_range": {
+            "type": "string",
+            "title": "时间范围",
+            "description": "例如：0:00–0:15"
+          },
+          "segment_type": {
+            "type": "string",
+            "title": "段落类型",
+            "enum": [
+              "开场",
+              "推进",
+              "冲突",
+              "转折",
+              "高潮",
+              "收束",
+              "悬念",
+              "闪回"
+            ]
+          },
+          "core_event": {
+            "type": "string",
+            "title": "核心事件"
+          },
+          "main_emotion": {
+            "type": "string",
+            "title": "主要情绪"
+          },
+          "main_characters": {
+            "type": "string",
+            "title": "主要角色"
+          },
+          "main_scene": {
+            "type": "string",
+            "title": "主要场景"
+          }
+        }
+      }
+    },
+    "text_storyboard": {
+      "type": "object",
+      "title": "文字分镜表（阶段一）",
+      "ui_component": "section",
+      "properties": {
+        "markdown": {
+          "type": "string",
+          "title": "完整分镜表 Markdown",
+          "ui_component": "markdown_viewer"
+        },
+        "total_duration": {
+          "type": "string",
+          "title": "总时长",
+          "ui_component": "text"
+        },
+        "pages": {
+          "type": "array",
+          "title": "分镜页列表",
+          "ui_component": "repeatable_section",
+          "items": {
+            "type": "object",
+            "required": [
+              "page_number",
+              "time_range",
+              "shots"
+            ],
+            "properties": {
+              "page_number": {
+                "type": "integer",
+                "title": "页码"
+              },
+              "time_range": {
+                "type": "string",
+                "title": "时间范围",
+                "description": "例如：第 1 页 / 0:00–0:15"
+              },
+              "page_assets": {
+                "type": "array",
+                "title": "本页使用资产",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "title": "类型"
+                    },
+                    "name": {
+                      "type": "string",
+                      "title": "名称"
+                    },
+                    "usage": {
+                      "type": "string",
+                      "title": "使用说明"
+                    }
+                  }
+                }
+              },
+              "shots": {
+                "type": "array",
+                "title": "镜头列表",
+                "ui_component": "table",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "shot_number",
+                    "time_range",
+                    "shot_size",
+                    "static_frame",
+                    "camera_movement",
+                    "action",
+                    "sound",
+                    "note"
+                  ],
+                  "properties": {
+                    "shot_number": {
+                      "type": "string",
+                      "title": "镜头号",
+                      "description": "例如：镜头 01"
+                    },
+                    "time_range": {
+                      "type": "string",
+                      "title": "时间",
+                      "description": "例如：0:00–0:04"
+                    },
+                    "shot_size": {
+                      "type": "string",
+                      "title": "景别 / 焦点"
+                    },
+                    "static_frame": {
+                      "type": "string",
+                      "title": "静态分镜画面"
+                    },
+                    "camera_movement": {
+                      "type": "string",
+                      "title": "运镜方式"
+                    },
+                    "action": {
+                      "type": "string",
+                      "title": "画面描述 / 动作"
+                    },
+                    "dialogue": {
+                      "type": "string",
+                      "title": "台词 / 旁白",
+                      "description": "无台词时填 —"
+                    },
+                    "sound": {
+                      "type": "string",
+                      "title": "音效 / 音乐"
+                    },
+                    "note": {
+                      "type": "string",
+                      "title": "备注"
+                    }
+                  }
+                }
+              },
+              "page_duration_seconds": {
+                "type": "integer",
+                "title": "本页时长（秒）",
+                "default": 15
+              }
+            }
+          }
+        },
+        "bottom_parameter_bar": {
+          "type": "object",
+          "title": "底部参数栏",
+          "ui_component": "section",
+          "properties": {
+            "visual_style": {
+              "type": "string",
+              "title": "整体风格 / 影像质感",
+              "ui_component": "textarea"
+            },
+            "cinematography": {
+              "type": "string",
+              "title": "摄影参数",
+              "ui_component": "textarea"
+            },
+            "action_design": {
+              "type": "string",
+              "title": "动作设计",
+              "ui_component": "textarea"
+            },
+            "sound_design": {
+              "type": "string",
+              "title": "音效设计",
+              "ui_component": "textarea"
+            },
+            "total_duration_label": {
+              "type": "string",
+              "title": "总时长",
+              "ui_component": "text"
+            }
+          }
+        }
+      }
+    },
+    "grid_outputs": {
+      "type": "array",
+      "title": "九宫格分镜图（阶段二）",
+      "description": "每 15 秒页面对应一张 3×3 宫格图",
+      "ui_component": "repeatable_section",
+      "items": {
+        "type": "object",
+        "required": [
+          "page_number",
+          "time_range"
+        ],
+        "properties": {
+          "page_number": {
+            "type": "integer",
+            "title": "页码"
+          },
+          "time_range": {
+            "type": "string",
+            "title": "时间范围"
+          },
+          "grid_image_url": {
+            "type": "string",
+            "title": "宫格图",
+            "format": "uri",
+            "ui_component": "image_viewer"
+          },
+          "aspect_ratio_per_cell": {
+            "type": "string",
+            "title": "每格内部画幅",
+            "description": "例如：9:16"
+          },
+          "grid_layout": {
+            "type": "string",
+            "title": "宫格结构",
+            "default": "3x3",
+            "ui_component": "text"
+          },
+          "cells": {
+            "type": "array",
+            "title": "九格内容规划",
+            "minItems": 9,
+            "maxItems": 9,
+            "ui_component": "table",
+            "items": {
+              "type": "object",
+              "required": [
+                "cell_number",
+                "shot_size",
+                "frame_description",
+                "performance_moment",
+                "camera_to_static"
+              ],
+              "properties": {
+                "cell_number": {
+                  "type": "integer",
+                  "title": "格子序号",
+                  "minimum": 1,
+                  "maximum": 9
+                },
+                "source_shot": {
+                  "type": "string",
+                  "title": "对应原镜头"
+                },
+                "shot_size": {
+                  "type": "string",
+                  "title": "景别 / 焦点"
+                },
+                "frame_description": {
+                  "type": "string",
+                  "title": "画面"
+                },
+                "performance_moment": {
+                  "type": "string",
+                  "title": "表演瞬间"
+                },
+                "camera_to_static": {
+                  "type": "string",
+                  "title": "运镜转静态构图"
+                }
+              }
+            }
+          },
+          "continuity_anchor": {
+            "type": "object",
+            "title": "跨页连续性锚点",
+            "properties": {
+              "from_previous_cell_9": {
+                "type": "string",
+                "title": "承接上一页第 9 格",
+                "description": "第 2 页及以后必填"
+              },
+              "to_next_cell_1": {
+                "type": "string",
+                "title": "衔接下一页第 1 格",
+                "description": "非最后一页时使用"
+              }
+            }
+          },
+          "image_prompt": {
+            "type": "string",
+            "title": "内部生图提示词",
+            "description": "/prompt 模式或无法直接生图时输出",
+            "ui_component": "markdown_viewer"
+          }
+        }
+      }
+    },
+    "consistency_report": {
+      "type": "object",
+      "title": "一致性检查",
+      "ui_component": "section",
+      "properties": {
+        "character_consistency": {
+          "type": "string",
+          "title": "角色一致性",
+          "ui_component": "textarea"
+        },
+        "scene_consistency": {
+          "type": "string",
+          "title": "场景一致性",
+          "ui_component": "textarea"
+        },
+        "prop_consistency": {
+          "type": "string",
+          "title": "道具一致性",
+          "ui_component": "textarea"
+        },
+        "time_closure_passed": {
+          "type": "boolean",
+          "title": "每页 15 秒时间闭合",
+          "ui_component": "checkbox"
+        },
+        "no_text_in_cells_passed": {
+          "type": "boolean",
+          "title": "宫格内无描述性文字（仅允许序号 1–9）",
+          "ui_component": "checkbox"
+        },
+        "pending_fields": {
+          "type": "array",
+          "title": "待补充字段",
+          "items": {
+            "type": "string"
+          },
+          "ui_component": "tag_list"
+        }
+      }
+    }
+  }
+}

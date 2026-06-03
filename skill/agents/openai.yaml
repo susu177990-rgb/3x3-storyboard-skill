@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storyboard Flow"
+  short_description: "Genre-agnostic director storyboards and 3x3 grids for AI video production"
+  default_prompt: "Use this skill to turn my script, story idea, or existing storyboard table into 15-second storyboard pages and generated 3x3 storyboard grid images. Works for any genre."

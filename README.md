@@ -1,63 +1,70 @@
-# 3×3 Storyboard Skill
+# 3x3 Storyboard Skill
 
-A genre-agnostic director storyboard skill for turning scripts, story ideas, and visual asset descriptions into a two-stage AI video storyboard workflow:
+一个面向 AI 视频预制作的导演分镜 Skill。它把用户提供的剧本、故事想法、角色资产、场景资产、道具资产和风格参考，拆解成两段式工作流：
 
-1. **Script / asset intake → 15-second-per-page director storyboard table**
-2. **Storyboard table → 3×3 nine-cell storyboard grid image prompt / image generation workflow**
+1. 阶段一：剧本 / 素材 -> 15 秒一页的导演流程图式文字分镜表
+2. 阶段二：文字分镜表 -> 3x3 九宫格分镜图 / 生图提示词
 
-The skill is designed for AI video production, short films, advertisements, game cinematics, music videos, and visual pre-production workflows. It does not lock the user into one visual style. Instead, the final tone, shot language, lighting, color palette, and cinematic texture are controlled by the user-provided script and visual assets.
+这个 Skill 不限定题材。剧情、科幻、悬疑、动作、爱情、喜剧、恐怖、广告、游戏 CG、MV、品牌短片都可以直接使用。风格、镜头语言、光线、调色、质感由用户输入决定，不被 Skill 预设绑死。
 
-## Core Capability
+## 核心能力
 
-This skill helps transform rough creative material into production-ready visual planning:
+- 把剧本或故事想法拆成可拍摄、可生成视频的镜头设计
+- 统一按每 15 秒一页生成完整文字分镜表
+- 每页输出镜头号、时间、景别、静态分镜画面、运镜、动作、台词 / 旁白、音效 / 音乐、备注
+- 把每页文字分镜扩展为固定 3x3、共 9 格的分镜宫格图
+- 在 `/next` 与 `/grid-all` 中强制执行跨页视觉连续性
+- 支持只输出内部生图提示词，不直接出图
+- 支持表单式输入和命令式工作流两种使用方式
 
-- Convert scripts, story ideas, and scene descriptions into director-style storyboard pages.
-- Split the project into **exactly 15-second pages**.
-- Generate structured shot tables with time ranges, shot size, frame description, camera movement, visible action, dialogue, sound, and narrative notes.
-- Convert each 15-second page into a **3×3 storyboard grid** with exactly 9 cells.
-- Maintain continuity across pages through character, costume, scene, prop, lighting, color, action, and emotional state.
-- Output internal image-generation prompts when direct image generation is not available.
+## 命令流程
 
-## Command Workflow
-
-| Command | Purpose |
+| 命令 | 作用 |
 |---|---|
-| `/start` | Activate the storyboard workflow and show the command menu. |
-| `/asset` | Output the asset intake template. |
-| `/storyboard` | Generate the full text storyboard from the provided script and assets. |
-| `/grid` | Generate the first 3×3 storyboard grid image from page 1. |
-| `/next` | Generate the next page’s grid image with cross-page continuity. |
-| `/grid-all` | Batch-generate all storyboard grid images sequentially. |
-| `/prompt` | Output image-generation prompts for all pages without generating images. |
-| `/help` | Show command help and usage guidance. |
+| `/start` | 启动导演分镜工作台并显示菜单 |
+| `/asset` | 输出素材填写模板 |
+| `/storyboard` | 阶段一：生成完整文字分镜表 |
+| `/grid` | 阶段二：生成第 1 页九宫格分镜图 |
+| `/next` | 阶段二：生成下一页九宫格分镜图，并保持跨页连续 |
+| `/grid-all` | 阶段二：一次性批量生成全部页面九宫格分镜图 |
+| `/prompt` | 阶段二：只输出全部页面的内部生图提示词 |
+| `/help` | 显示命令说明与使用指引 |
 
-## Standard Usage
+标准使用顺序：
 
 ```text
 /start
 /asset
-[paste or upload project assets + script]
+[填写并发送素材 + 剧本]
 /storyboard
 /grid
 /next
 /next
 ```
 
-For prompt-only workflows:
+如果只要提示词：
 
 ```text
 /start
 /asset
-[paste or upload project assets + script]
+[填写并发送素材 + 剧本]
 /storyboard
 /prompt
 ```
 
-## Output Structure
+## 工作流结构
 
-### Stage 1: Text Storyboard
+### 阶段一：文字分镜
 
-Stage 1 produces a complete director storyboard table:
+阶段一一次性输出整部片子的文字版导演流程图式分镜表，而不是只输出第一页。默认规则：
+
+- 每页严格 15 秒
+- 每页通常 4 到 6 个镜头，允许按节奏变化浮动
+- 输出语言默认简体中文
+- 所有镜头必须可拍摄、可生成、动作清晰
+- 资产不完整时先生成可执行版本，并把不确定项标为 `待补充`
+
+输出结构核心如下：
 
 ```md
 # 导演流程图式分镜表
@@ -72,21 +79,70 @@ Stage 1 produces a complete director storyboard table:
 | 镜头号 | 时间 | 景别 | 静态分镜画面 | 运镜方式 | 画面描述 / 动作 | 台词 / 旁白 | 音效 / 音乐 | 备注 |
 |---|---|---|---|---|---|---|---|---|
 
+---
+
 ## 底部参数栏
+【整体风格 / 影像质感】
+【摄影参数】
+【动作设计】
+【音效设计】
+【总时长】
 ```
 
-### Stage 2: 3×3 Storyboard Grid
+### 阶段二：3x3 九宫格分镜图
 
-Stage 2 converts each 15-second page into one fixed 3×3 storyboard grid:
+阶段二把每一页 15 秒文字分镜转换成一张固定 3x3、共 9 格的分镜宫格图。
 
-- exactly 9 cells
-- left-to-right, top-to-bottom time order
-- one generated image per 15-second page
-- no text, captions, shot numbers, timecodes, tables, or parameter bars inside the cells
-- only a small optional sequence number `1–9` in the top-left corner is allowed
-- each cell uses the user’s film aspect ratio internally, rather than applying the ratio to the entire grid canvas
+关键规则：
 
-## Repository Structure
+- 一页对应一张图
+- 永远固定 3x3，共 9 格
+- 时间顺序为从左到右、从上到下
+- 如果原页只有 4 到 6 个镜头，必须补拆成 9 个连续表演瞬间
+- 每个格子内部使用用户影片画幅，不把整张九宫格强行做成该画幅
+- 图中除每格左上角可有小号 1-9 序号外，不能有其他说明文字
+
+`/grid` 生成第 1 页，`/next` 逐页推进，`/grid-all` 一次性跑完整部片。
+
+## 跨页连续性
+
+从第 2 页开始，必须把上一页第 9 格与当前页第 1 格做成连续电影帧关系。以下要素必须连续：
+
+- 角色脸型、发型、发色、肤色、体型
+- 服装、装甲、配饰、机械结构
+- 动作状态和身体朝向
+- 场景空间、物件位置、光线方向
+- 道具状态
+- 色温、调色、影像质感、情绪氛围
+
+如果模型支持参考图输入，应直接附带上一页宫格图；如果不支持，也必须把上一页第 9 格的视觉状态写进提示词。
+
+## 表单接口
+
+仓库内置了 UI schema，适用于表单驱动的 Skill 运行方式。
+
+### `interface/input.json`
+
+定义输入表单，包括：
+
+- 执行阶段选择：`storyboard` / `grid` / `next` / `grid-all` / `prompt`
+- 项目信息：项目名称、类型、时长、画幅比例、影像质感、输出语言
+- 剧本输入：上传文件或直接文本输入
+- 角色资产、场景资产、道具资产、风格参考、调色参考
+- 阶段二补充上下文与高级选项
+
+### `interface/output.json`
+
+定义输出结构，包括：
+
+- 当前阶段与执行状态
+- 全片资产汇总
+- 页面规划表
+- 阶段一文字分镜表
+- 阶段二九宫格结果
+- 阶段二提示词结果
+
+## 目录结构
 
 ```text
 .
@@ -116,34 +172,33 @@ Stage 2 converts each 15-second page into one fixed 3×3 storyboard grid:
         └── example_output.md
 ```
 
-## Key Design Rules
+## 规则设计
 
-- Stage 1 text planning and Stage 2 image generation must remain separate.
-- Each Stage 1 page totals exactly 15 seconds.
-- Every shot must be filmable, video-generatable, and visually concrete.
-- Psychological states must be translated into visible action, lighting, framing, expression, body movement, and sound.
-- The user’s character, costume, prop, weapon, scene, style, and color references must be preserved.
-- Stage 2 always uses a fixed 3×3 grid with exactly 9 cells.
-- Cross-page visual continuity is mandatory for `/next` and `/grid-all`.
+- 阶段一和阶段二必须分离，不能混在一次输出里
+- 阶段一必须一次性产出全部页面，不半路停下追问
+- 阶段二必须始终固定 3x3 九宫格，不能退回 2x2、2x3 或按镜头数浮动
+- 所有镜头都必须把心理状态翻译成可见的动作、表情、灯光、构图与声音
+- 必须优先服从用户素材中的角色、服装、道具、场景与风格锚点
+- 对话场景必须遵守正反打、轴线、反应镜头等专业拆镜原则
 
-## Interface Schemas
+## 适用场景
 
-The `interface/` folder contains JSON schemas for UI-driven use:
+- AI 视频预制作
+- 短片导演分镜
+- 广告脚本可视化
+- MV / 游戏 CG 预演
+- 图生视频 / 文生视频 的镜头规划
+- 多页连续镜头设计
 
-- `input.json` defines project metadata, script input, character assets, scene assets, props, style references, color grading, Stage 2 context, and advanced options.
-- `output.json` defines text storyboard output, page planning, asset summaries, 3×3 grid results, and image prompt output.
+## 仓库内容说明
 
-## Intended Use Cases
+这个仓库包含完整 Skill 包：
 
-- AI video pre-production
-- short-film storyboard planning
-- commercial / advertisement storyboard planning
-- music video visual planning
-- game cinematic planning
-- social video storyboard workflows
-- text-to-image / image-to-video shot breakdowns
-- multi-page visual continuity control
+- 入口规则：`skill/SKILL.md`
+- 两段式工作流：`skill/workflows/`
+- 输入模板：`skill/templates/`
+- 连续性 / 镜头语言 / 画质规则：`skill/rules/`
+- UI 表单 schema：`interface/`
+- 示例输入输出：`skill/examples/`
 
-## Notes
-
-This repository contains the complete skill package, including the runtime entrypoint, workflow documents, templates, continuity rules, shot-language rules, image-quality rules, UI schemas, and examples.
+如果要继续扩展，优先保持这套两段式结构和固定 3x3 输出契约，不要把提示词堆回单文件大杂烩。

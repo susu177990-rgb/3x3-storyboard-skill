@@ -1,0 +1,89 @@
+Storyboard Flow Skill file manifest
+
+Root:
+分镜skill/
+
+Required core:
+1. SKILL.md
+   Purpose: Standard skill entrypoint with YAML frontmatter, trigger description, execution router, defaults, hard rules, and output contracts.
+   Status: required.
+
+2. .skillignore
+   Purpose: Packaging ignore list for local sessions, caches, logs, and generated metadata.
+   Status: recommended.
+
+Recommended UI metadata:
+3. agents/openai.yaml
+   Purpose: Human-facing skill display name, short description, and default prompt.
+   Status: recommended.
+
+Workflow files:
+4. workflows/01_script_to_text_storyboard.md
+   Purpose: Convert script + assets into 15-second text storyboard pages.
+   Use when: the user provides a script, story idea, asset list, or asks for director storyboard tables.
+
+5. workflows/02_text_storyboard_to_grid_prompt.md
+   Purpose: Convert one 15-second text storyboard page directly into one generated 3x3 storyboard grid image.
+   Use when: the user provides an existing page/table and asks for a storyboard grid image, or when the full pipeline reaches Stage 2.
+
+Templates:
+6. templates/asset_input_template.md
+   Purpose: Normalize character, scene, prop, style, and color-reference asset intake.
+
+7. templates/text_storyboard_page_template.md
+   Purpose: Fixed text storyboard page format, including asset table, shot table, and bottom parameter bar.
+
+8. templates/grid_image_prompt_template.md
+   Purpose: Internal direct-image-generation template for fixed 3x3 storyboard grids, nine-cell expansion, per-cell aspect ratio, consistency rules, and no-text prohibitions.
+
+Rule references:
+9. rules/continuity_rules.md
+   Purpose: Character, scene, prop, light, time, action, and page-to-page continuity.
+
+10. rules/shot_language_rules.md
+   Purpose: Shot size, camera movement, pacing, time allocation, action design, and edit logic.
+
+11. rules/image_quality_rules.md
+    Purpose: Grid image quality, cinematic realism, layout, composition, lighting, and no-text constraints.
+
+Examples:
+12. examples/example_input.md
+    Purpose: Example user input for script and asset intake.
+
+13. examples/example_output.md
+    Purpose: Example output for text storyboard pages and direct 3x3 grid image generation planning.
+
+Suggested package contents:
+
+分镜skill/
+├── SKILL.md
+├── .skillignore
+├── agents/
+│   └── openai.yaml
+├── workflows/
+│   ├── 01_script_to_text_storyboard.md
+│   └── 02_text_storyboard_to_grid_prompt.md
+├── templates/
+│   ├── asset_input_template.md
+│   ├── text_storyboard_page_template.md
+│   └── grid_image_prompt_template.md
+├── rules/
+│   ├── continuity_rules.md
+│   ├── shot_language_rules.md
+│   └── image_quality_rules.md
+├── examples/
+│   ├── example_input.md
+│   └── example_output.md
+└── manifest.txt
+
+Exclude from packaging:
+- .omc/
+- any local sessions, caches, logs, or editor metadata
+
+Execution summary:
+
+Script or story idea
+-> workflows/01_script_to_text_storyboard.md
+-> text storyboard page(s)
+-> workflows/02_text_storyboard_to_grid_prompt.md
+-> one generated 3x3 storyboard grid image per 15-second page
